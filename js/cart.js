@@ -34,6 +34,8 @@
 
   // ── DRAWER OPEN / CLOSE ───────────────────────────────
   function openDrawer() {
+    if (window.CasanovaWishlist) window.CasanovaWishlist.close();
+    if (window.CasanovaSearch)   window.CasanovaSearch.close();
     cartDrawer.classList.add('open');
     cartOverlay.classList.add('visible');
     document.body.style.overflow = 'hidden';
