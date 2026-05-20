@@ -10,7 +10,7 @@
   // Todas las imágenes viven en Recursos/productos/
   // Formatos aceptados: .jpg .jpeg .png .webp
   // Nomenclatura: marca-nombre-corto.jpg (minúsculas, guiones)
-  var IMG = 'Recursos/productos/';
+  var IMG = 'Recursos/Productos/';
 
   // ── 6 PRODUCTOS — 1 por categoría (labios ×2) ─────────
   // Para agregar un producto nuevo: copia el bloque, asigna
