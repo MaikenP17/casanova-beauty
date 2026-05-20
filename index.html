@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casanova Beauty — Makeup Premium</title>
+  <meta name="description" content="Tienda online de makeup premium. Rhode, Charlotte Tilbury, Rare Beauty, KIKO, e.l.f. y NYX. Envío a todo Colombia.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <button class="nav-hamburger" id="navHamburger" aria-label="Menú">
+        <span></span><span></span><span></span>
+      </button>
+      <a href="#" class="nav-logo">Casanova Beauty</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#products" data-cat="labios">Labios</a></li>
+        <li><a href="#products" data-cat="ojos">Ojos</a></li>
+        <li><a href="#products" data-cat="base">Base</a></li>
+        <li><a href="#products" data-cat="rostro">Rostro</a></li>
+        <li><a href="#products" data-cat="skincare">Skincare</a></li>
+        <li><a href="#products" data-cat="todos">Marcas</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="nav-btn" aria-label="Buscar">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button class="nav-btn" aria-label="Lista de deseos">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="nav-btn nav-cart-btn" id="cartBtn" aria-label="Carrito">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="cart-badge" id="cartCount">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SCROLL ANIMATION -->
+  <section id="hero-scroll-wrapper">
+    <div id="hero-sticky">
+      <canvas id="scroll-canvas"></canvas>
+      <div class="canvas-gradient"></div>
+
+      <div class="hero-overlay hero-overlay--brand" data-start="-0.05" data-end="0.15" id="txt-brand">
+        <span class="overlay-eyebrow">Bienvenida a</span>
+        <h1 class="overlay-title">Casanova<br>Beauty</h1>
+      </div>
+
+      <div class="hero-overlay hero-overlay--mirada" data-start="0.22" data-end="0.38" id="txt-mirada">
+        <p class="overlay-phrase">Define<br>tu mirada</p>
+      </div>
+
+      <div class="hero-overlay hero-overlay--color" data-start="0.42" data-end="0.57" id="txt-color">
+        <p class="overlay-phrase">El color<br>que te define</p>
+      </div>
+
+      <div class="hero-overlay hero-overlay--arte" data-start="0.61" data-end="0.77" id="txt-arte">
+        <p class="overlay-phrase-sm">Makeup &nbsp;&middot;&nbsp; Arte &nbsp;&middot;&nbsp; Identidad</p>
+      </div>
+
+      <div class="hero-overlay hero-overlay--cta" data-start="0.81" data-end="1.0" id="txt-cta">
+        <p class="overlay-cta-label">Descubre la coleccion</p>
+        <div class="overlay-cta-arrow">&#8595;</div>
+      </div>
+
+      <div class="hero-loader" id="heroLoader">
+        <div class="hero-loader-ring"></div>
+        <p>Un momento&hellip;</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTOS -->
+  <section id="products" class="section-fade">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">Coleccion</span>
+        <h2 class="section-title">Las marcas que el mundo ama</h2>
+        <p class="section-subtitle">Curadas con obsesion. Enviadas a tu puerta.</p>
+      </div>
+      <div class="filter-tabs" id="filterTabs" role="tablist">
+        <button class="filter-tab active" data-filter="todos" role="tab">Todos</button>
+        <button class="filter-tab" data-filter="labios" role="tab">Labios</button>
+        <button class="filter-tab" data-filter="ojos" role="tab">Ojos</button>
+        <button class="filter-tab" data-filter="base" role="tab">Base</button>
+        <button class="filter-tab" data-filter="rostro" role="tab">Rostro</button>
+        <button class="filter-tab" data-filter="skincare" role="tab">Skincare</button>
+      </div>
+      <div class="product-grid" id="productGrid"></div>
+    </div>
+  </section>
+
+  <!-- FILOSOFIA -->
+  <section id="filosofia" class="section-fade">
+    <div class="filosofia-inner">
+      <div class="filosofia-text">
+        <span class="section-eyebrow">Nuestra filosofia</span>
+        <h2 class="filosofia-title">Belleza que<br><em>cuenta una historia</em></h2>
+        <p class="filosofia-body">En Casanova Beauty creemos que el makeup no es una mascara&mdash;es un idioma. Cada trazo, cada tono, cada textura es una frase en el relato que escribes cada manana.</p>
+        <p class="filosofia-body">Curadas con obsesion, seleccionadas con criterio. Las marcas que ofrecemos comparten una sola conviccion: la belleza premium no deberia ser un privilegio.</p>
+        <a href="#products" class="btn-outline">Explorar coleccion</a>
+      </div>
+      <div class="filosofia-image">
+        <div class="filosofia-img-wrapper">
+          <img
+            src="https://images.unsplash.com/photo-1643168186368-c42359c82573?w=900&q=85&fit=crop"
+            alt="Productos de belleza premium sobre mármol"
+            loading="lazy"
+            crossorigin="anonymous"
+            onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(145deg,#E8D5C4,#F2C4C4,#C49A8A)'"
+          >
+        </div>
+        <div class="filosofia-accent-dot"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOOKS DESTACADOS -->
+  <section id="looks" class="section-fade looks-section">
+    <div class="looks-header container">
+      <span class="looks-label">INSPIRACIÓN</span>
+      <h2>El look <em>del momento</em></h2>
+      <p>Descubre cómo llevar los productos de la temporada</p>
+    </div>
+    <div class="looks-grid">
+      <div class="look-card">
+        <img src="https://images.unsplash.com/photo-1777840347880-747242e0db00?w=800&q=85&fit=crop" alt="Glass Skin Morning" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(160deg,#F2C4C4,#E8D5C4)'">
+        <div class="look-card-overlay">
+          <p class="look-card-title">Glass Skin Morning</p>
+          <p class="look-card-products">Halo Glow + Barrier Butter</p>
+        </div>
+      </div>
+      <div class="look-card">
+        <img src="https://images.unsplash.com/photo-1773372238338-f26460145162?w=800&q=85&fit=crop" alt="Pillow Talk All Day" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(160deg,#E8C4C4,#D4A0A0)'">
+        <div class="look-card-overlay">
+          <p class="look-card-title">Pillow Talk All Day</p>
+          <p class="look-card-products">Pillow Talk Lipstick + Soft Pinch Blush</p>
+        </div>
+      </div>
+      <div class="look-card">
+        <img src="https://images.unsplash.com/photo-1550883061-e58edd195480?w=800&q=85&fit=crop" alt="No Makeup Makeup" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(160deg,#EDD5C0,#C49A8A)'">
+        <div class="look-card-overlay">
+          <p class="look-card-title">No Makeup Makeup</p>
+          <p class="look-card-products">Flawless Filter + Putty Blush</p>
+        </div>
+      </div>
+      <div class="look-card">
+        <img src="https://images.unsplash.com/photo-1631214524042-6177152a3980?w=800&q=85&fit=crop" alt="Glazed Lip Moment" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(160deg,#F9D5D5,#F2C4C4)'">
+        <div class="look-card-overlay">
+          <p class="look-card-title">Glazed Lip Moment</p>
+          <p class="look-card-products">Peptide Lip Treatment + Barrier Butter</p>
+        </div>
+      </div>
+      <div class="look-card">
+        <img src="https://images.unsplash.com/photo-1574725576842-ad61046325ee?w=800&q=85&fit=crop" alt="Editorial Night" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(160deg,#2C1A18,#5C3A30)'">
+        <div class="look-card-overlay">
+          <p class="look-card-title">Editorial Night</p>
+          <p class="look-card-products">Epic Ink Liner + Power Pro Mascara</p>
+        </div>
+      </div>
+      <div class="look-card">
+        <img src="https://images.unsplash.com/photo-1773372238330-9820bd070490?w=800&q=85&fit=crop" alt="Soft Glow Sunday" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.parentNode.style.background='linear-gradient(160deg,#F2C4C4,#FDF6F3)'">
+        <div class="look-card-overlay">
+          <p class="look-card-title">Soft Glow Sunday</p>
+          <p class="look-card-products">Pocket Blush + CC Cream SPF30</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer id="footer">
+    <div class="footer-top container">
+      <div class="footer-brand">
+        <p class="footer-logo">Casanova Beauty</p>
+        <p class="footer-tagline">Makeup que cuenta tu historia.</p>
+        <div class="footer-trust">
+          <span class="trust-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Pago seguro</span>
+          <span class="trust-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Envio a todo Colombia</span>
+          <span class="trust-badge"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> Devoluciones gratis</span>
+        </div>
+      </div>
+      <div class="footer-links-wrapper">
+        <div class="footer-col">
+          <h4>Tienda</h4>
+          <ul>
+            <li><a href="#">Novedades</a></li>
+            <li><a href="#">Mas vendidos</a></li>
+            <li><a href="#">Ofertas</a></li>
+            <li><a href="#">Todas las marcas</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Ayuda</h4>
+          <ul>
+            <li><a href="#">Seguimiento</a></li>
+            <li><a href="#">Devoluciones</a></li>
+            <li><a href="#">Contacto</a></li>
+            <li><a href="#">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Empresa</h4>
+          <ul>
+            <li><a href="#">Sobre nosotros</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Privacidad</a></li>
+            <li><a href="#">Terminos</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-newsletter">
+        <h4>Unete y recibe</h4>
+        <p>10% en tu primera compra + acceso anticipado a novedades.</p>
+        <form class="newsletter-form" onsubmit="handleNewsletter(event)">
+          <input type="email" placeholder="tu@email.com" required>
+          <button type="submit">Suscribirse</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Casanova Beauty. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- CART DRAWER -->
+  <div id="cartOverlay"></div>
+  <aside id="cartDrawer" aria-label="Carrito de compras">
+    <div class="cart-header">
+      <h3>Tu carrito</h3>
+      <button class="cart-close" id="cartClose" aria-label="Cerrar">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-body">
+      <div class="cart-empty" id="cartEmpty">
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <p>Tu carrito esta vacio</p>
+        <span>Agrega productos para comenzar</span>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+    </div>
+    <div class="cart-footer" id="cartFooter">
+      <div class="cart-subtotal-row">
+        <span>Subtotal</span>
+        <span id="cartSubtotal" class="cart-subtotal-amount">$0</span>
+      </div>
+      <p class="cart-shipping-note">Envio gratis en compras mayores a $150.000</p>
+      <button class="btn-checkout">Finalizar Compra</button>
+    </div>
+  </aside>
+
+  <!-- SCRIPTS -->
+  <script src="js/scroll-video.js" defer></script>
+  <script src="js/cart.js" defer></script>
+  <script src="js/filters.js" defer></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Section fade-in via Intersection Observer
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.section-fade').forEach(function(el) { observer.observe(el); });
+
+      // Hamburger menu
+      var hamburger = document.getElementById('navHamburger');
+      var navLinks = document.getElementById('navLinks');
+      hamburger.addEventListener('click', function() {
+        navLinks.classList.toggle('open');
+        hamburger.classList.toggle('open');
+      });
+      navLinks.querySelectorAll('a').forEach(function(a) {
+        a.addEventListener('click', function() {
+          navLinks.classList.remove('open');
+          hamburger.classList.remove('open');
+        });
+      });
+
+      // Nav categoria links -> filtrar + scroll
+      document.querySelectorAll('[data-cat]').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          var cat = link.dataset.cat;
+          var tab = document.querySelector('[data-filter="' + cat + '"]');
+          if (tab) tab.click();
+          document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+    });
+
+    function handleNewsletter(e) {
+      e.preventDefault();
+      var btn = e.target.querySelector('button');
+      var input = e.target.querySelector('input');
+      btn.textContent = 'Suscrita!';
+      input.value = '';
+      setTimeout(function() { btn.textContent = 'Suscribirse'; }, 3000);
+    }
+  </script>
+</body>
+</html>
