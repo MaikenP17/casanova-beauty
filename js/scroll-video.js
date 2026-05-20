@@ -11,7 +11,7 @@
   var TOTAL_FRAMES = 106;
   var FRAME_BASE   = 'Recursos/frames/frame_';
   var FRAME_EXT    = '.webp';
-  var PRELOAD_MIN  = 12; // frames para activar scroll (carga rápida)
+  var PRELOAD_MIN  = 1; // frame 0 basta para mostrar algo — móvil no debe esperar
 
   // ── DOM ───────────────────────────────────────────────
   var wrapper  = document.getElementById('hero-scroll-wrapper');
