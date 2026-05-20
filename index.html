@@ -298,12 +298,55 @@
     </div>
   </aside>
 
+  <!-- QUICK VIEW MODAL -->
+  <div id="qvOverlay" role="dialog" aria-modal="true" aria-label="Vista rápida del producto">
+    <div id="qvModal">
+      <button id="qvClose" aria-label="Cerrar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="qv-body">
+        <div class="qv-image-col">
+          <img id="qvImage" src="" alt="" loading="eager">
+        </div>
+        <div class="qv-details-col">
+          <div class="qv-eyebrow">
+            <span class="qv-brand" id="qvBrand"></span>
+            <span class="qv-category-tag" id="qvCategory"></span>
+          </div>
+          <h2 class="qv-name" id="qvName"></h2>
+          <p class="qv-price" id="qvPrice"></p>
+          <p class="qv-desc" id="qvDesc"></p>
+          <div>
+            <p class="qv-benefits-title">Beneficios</p>
+            <ul class="qv-benefits-list" id="qvBenefits"></ul>
+          </div>
+          <div id="qvHowToWrap">
+            <p class="qv-howto-title">Cómo usarlo</p>
+            <p class="qv-howto" id="qvHowTo"></p>
+          </div>
+          <div class="qv-cta">
+            <button id="qvAddBtn"
+              data-id="" data-name="" data-brand="" data-price="" data-img=""
+              aria-label="Agregar al carrito">Agregar al carrito</button>
+            <button id="qvWishBtn"
+              data-id="" data-name="" data-brand="" data-price="" data-img=""
+              aria-label="Guardar en favoritos">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span class="qv-wish-label">Guardar</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- SCRIPTS -->
   <script src="js/scroll-video.js" defer></script>
   <script src="js/cart.js" defer></script>
   <script src="js/filters.js" defer></script>
   <script src="js/wishlist.js" defer></script>
   <script src="js/search.js" defer></script>
+  <script src="js/quickview.js" defer></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
