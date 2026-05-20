@@ -47,34 +47,33 @@ if (!videoPath) {
 console.log(`✅ Video encontrado: ${path.basename(videoPath)}`);
 console.log('⏳ Extrayendo frames... esto puede tomar unos segundos.');
 
-// Limpia frames anteriores
-const prevFrames = fs.readdirSync(framesDir).filter(f => f.endsWith('.jpg'));
+// Limpia frames anteriores (jpg y webp)
+const prevFrames = fs.readdirSync(framesDir).filter(f => f.endsWith('.webp') || f.endsWith('.jpg'));
 if (prevFrames.length > 0) {
   console.log(`   Eliminando ${prevFrames.length} frames anteriores...`);
   prevFrames.forEach(f => fs.unlinkSync(path.join(framesDir, f)));
 }
 
-// Extrae frames: 24fps, máxima calidad visual, resolución nativa
-const outputPattern = path.join(framesDir, 'frame_%04d.jpg');
+// Extrae frames: 15fps, WebP calidad 78, 1280px — ~106 frames para 7s de video
+const outputPattern = path.join(framesDir, 'frame_%04d.webp');
 try {
-  execSync(`ffmpeg -i "${videoPath}" -vf "fps=24" -q:v 3 "${outputPattern}"`, {
-    stdio: 'inherit'
-  });
+  execSync(
+    `ffmpeg -y -i "${videoPath}" -vf "fps=15,scale=1280:-2" -c:v libwebp -quality 78 -compression_level 4 -lossless 0 "${outputPattern}"`,
+    { stdio: 'inherit' }
+  );
 } catch (e) {
   console.error('\n❌ ffmpeg falló. ¿Está instalado y en el PATH del sistema?');
   console.error('   Descarga: https://ffmpeg.org/download.html');
   process.exit(1);
 }
 
-const frameCount = fs.readdirSync(framesDir).filter(f => f.endsWith('.jpg')).length;
+const frameCount = fs.readdirSync(framesDir).filter(f => f.endsWith('.webp')).length;
 
 if (frameCount === 0) {
   console.error('❌ No se generaron frames. Revisa el video o los permisos de carpeta.');
   process.exit(1);
 }
 
-console.log(`\n✅ ${frameCount} frames extraídos en Recursos/frames/`);
-console.log(`\n📝 SIGUIENTE PASO:`);
-console.log(`   Abre js/scroll-video.js y actualiza la constante:`);
-console.log(`   var TOTAL_FRAMES = ${frameCount};`);
-console.log(`\n   Luego abre index.html en Chrome y la animación funcionará.`);
+console.log(`\n✅ ${frameCount} frames WebP extraídos en Recursos/frames/`);
+console.log(`   TOTAL_FRAMES ya está fijado en scroll-video.js — no necesitas cambiarlo.`);
+console.log(`\n   Haz push de los frames a Git y Vercel los servirá automáticamente.`);

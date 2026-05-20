@@ -1,17 +1,17 @@
 /* ═══════════════════════════════════════════════════════
    CASANOVA BEAUTY — scroll-video.js
-   Animación scroll frame-a-frame con detección automática:
-   • Modo FRAMES: carga imágenes de /Recursos/frames/ (después de extract-frames.js)
-   • Modo VIDEO:  fallback si los frames no existen aún
+   Animación scroll frame-a-frame desde imágenes WebP.
+   Fallback a video si los frames no existen.
 ═══════════════════════════════════════════════════════ */
 
 (function () {
   'use strict';
 
-  // ── CONFIG — actualizar TOTAL_FRAMES después de ejecutar extract-frames.js ──
-  var TOTAL_FRAMES = 169;
+  // ── CONFIG ────────────────────────────────────────────
+  var TOTAL_FRAMES = 106;
   var FRAME_BASE   = 'Recursos/frames/frame_';
-  var PRELOAD_MIN  = 20; // frames mínimos antes de activar scroll
+  var FRAME_EXT    = '.webp';
+  var PRELOAD_MIN  = 12; // frames para activar scroll (carga rápida)
 
   // ── DOM ───────────────────────────────────────────────
   var wrapper  = document.getElementById('hero-scroll-wrapper');
@@ -23,10 +23,11 @@
   if (!wrapper || !canvas) return;
 
   var ctx = canvas.getContext('2d');
-  var dpr = window.devicePixelRatio || 1;
+  // Limitar DPR a 2 — en móviles con DPR 3 el canvas cuadriplica memoria sin ganancia visual
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
   var ticking = false;
 
-  // ── CANVAS ────────────────────────────────────────────
+  // ── CANVAS RESIZE ────────────────────────────────────
   function resizeCanvas() {
     var w = window.innerWidth;
     var h = window.innerHeight;
@@ -41,7 +42,7 @@
   function drawSource(src) {
     var cw = window.innerWidth;
     var ch = window.innerHeight;
-    var iw = src.naturalWidth || src.videoWidth  || 1280;
+    var iw = src.naturalWidth  || src.videoWidth  || 1280;
     var ih = src.naturalHeight || src.videoHeight || 720;
     var imgA = iw / ih;
     var cvA  = cw / ch;
@@ -83,15 +84,15 @@
   }
 
   function updateNavbar() {
-    navbar.classList.toggle('scrolled', (window.scrollY || 0) > 50);
+    if (navbar) navbar.classList.toggle('scrolled', (window.scrollY || 0) > 50);
   }
 
   function frameSrc(i) {
-    return FRAME_BASE + String(i + 1).padStart(4, '0') + '.jpg';
+    return FRAME_BASE + String(i + 1).padStart(4, '0') + FRAME_EXT;
   }
 
   // ══════════════════════════════════════════════════════
-  // MODO A — FRAMES desde disco
+  // MODO A — FRAMES WebP desde disco
   // ══════════════════════════════════════════════════════
   var frames       = new Array(TOTAL_FRAMES);
   var framesLoaded = 0;
@@ -100,37 +101,42 @@
 
   function onScrollFrames() {
     if (!scrollReady) return;
-    if (!ticking) {
-      requestAnimationFrame(function () {
-        var p = getProgress();
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var p   = getProgress();
+      var idx = Math.min(Math.floor(p * TOTAL_FRAMES), TOTAL_FRAMES - 1);
 
-        // Fórmula del usuario: scrollY/scrollHeight * totalFrames
-        var idx = Math.min(
-          Math.floor(p * TOTAL_FRAMES),
-          TOTAL_FRAMES - 1
-        );
-
-        if (idx !== lastFrameIdx) {
-          var img = frames[idx];
-          if (img && img.complete && img.naturalWidth > 0) {
-            drawSource(img);
-            lastFrameIdx = idx;
+      if (idx !== lastFrameIdx) {
+        var img = frames[idx];
+        if (img && img.complete && img.naturalWidth > 0) {
+          drawSource(img);
+          lastFrameIdx = idx;
+        } else {
+          // Frame aún no cargado: dibuja el más cercano disponible
+          for (var d = 1; d < 10; d++) {
+            var prev = frames[idx - d];
+            if (prev && prev.complete && prev.naturalWidth > 0) { drawSource(prev); break; }
           }
         }
+      }
 
-        updateOverlays(p);
-        updateNavbar();
-        ticking = false;
-      });
-      ticking = true;
-    }
+      updateOverlays(p);
+      updateNavbar();
+      ticking = false;
+    });
   }
 
   function startFrameMode(firstFrame) {
     frames[0] = firstFrame;
     framesLoaded = 1;
 
-    // Precarga el resto
+    // Dibuja frame 0 inmediatamente
+    resizeCanvas();
+    drawSource(firstFrame);
+    lastFrameIdx = 0;
+
+    // Precarga todos los frames en segundo plano
     for (var i = 1; i < TOTAL_FRAMES; i++) {
       (function (idx) {
         var img = new Image();
@@ -138,29 +144,28 @@
           framesLoaded++;
           if (!scrollReady && framesLoaded >= PRELOAD_MIN) {
             scrollReady = true;
-            loader.classList.add('hidden');
-            drawSource(frames[0]);
-            lastFrameIdx = 0;
+            if (loader) loader.classList.add('hidden');
           }
         };
-        img.onerror = function () { framesLoaded++; };
+        img.onerror = function () {
+          framesLoaded++;
+        };
         img.src = frameSrc(idx);
         frames[idx] = img;
       })(i);
     }
 
-    // Si PRELOAD_MIN ≤ 1 (o el frame 0 ya es suficiente)
-    if (PRELOAD_MIN <= 1) {
+    // Activar scroll si PRELOAD_MIN ya está satisfecho con el frame 0
+    if (framesLoaded >= PRELOAD_MIN) {
       scrollReady = true;
-      loader.classList.add('hidden');
-      drawSource(frames[0]);
-      lastFrameIdx = 0;
+      if (loader) loader.classList.add('hidden');
     }
 
     window.addEventListener('scroll', onScrollFrames, { passive: true });
     window.addEventListener('resize', function () {
       resizeCanvas();
-      if (lastFrameIdx >= 0 && frames[lastFrameIdx]) drawSource(frames[lastFrameIdx]);
+      var cur = frames[lastFrameIdx >= 0 ? lastFrameIdx : 0];
+      if (cur && cur.complete) drawSource(cur);
     });
   }
 
@@ -182,16 +187,15 @@
   }
 
   function onScrollVideo() {
-    if (!ticking) {
-      requestAnimationFrame(function () {
-        var p = getProgress();
-        seekVideo(p);
-        updateOverlays(p);
-        updateNavbar();
-        ticking = false;
-      });
-      ticking = true;
-    }
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(function () {
+      var p = getProgress();
+      seekVideo(p);
+      updateOverlays(p);
+      updateNavbar();
+      ticking = false;
+    });
   }
 
   function startVideoMode() {
@@ -206,12 +210,12 @@
     function onReady() {
       if (videoReady) return;
       videoReady = true;
-      loader.classList.add('hidden');
+      if (loader) loader.classList.add('hidden');
       video.currentTime = 0;
     }
 
     video.addEventListener('loadeddata', onReady);
-    video.addEventListener('canplay', onReady);
+    video.addEventListener('canplay',    onReady);
     video.addEventListener('seeked', function () {
       drawSource(video);
       isSeeking = false;
@@ -222,8 +226,7 @@
       }
     });
     video.addEventListener('error', function () {
-      loader.classList.add('hidden');
-      console.warn('[CasanovaBeauty] Video no encontrado. Ejecuta: node extract-frames.js');
+      if (loader) loader.classList.add('hidden');
     });
 
     video.src = 'Recursos/' + encodeURIComponent('Video Scroll.mp4');
@@ -235,31 +238,26 @@
     });
   }
 
-  // ── INIT: detecta si existen frames ──────────────────
+  // ── INIT ─────────────────────────────────────────────
   function init() {
     resizeCanvas();
     updateOverlays(0);
     updateNavbar();
 
-    // Sondea si frame_0001.jpg existe
+    // Prueba si frame_0001.webp existe
     var probe = new Image();
-
     probe.onload = function () {
-      // ✅ Frames encontrados → Modo A
       startFrameMode(probe);
     };
-
     probe.onerror = function () {
-      // ❌ Sin frames → Modo B (video)
-      console.info('[CasanovaBeauty] Sin frames en /Recursos/frames/. Usando video directo.');
-      console.info('   Para mejor rendimiento ejecuta: node extract-frames.js');
+      console.info('[CasanovaBeauty] Sin frames WebP. Usando video directo.');
+      console.info('   Para mejor rendimiento: node extract-frames.js');
       startVideoMode();
     };
-
     probe.src = frameSrc(0);
 
-    // Seguro: ocultar loader máximo en 8s
-    setTimeout(function () { loader.classList.add('hidden'); }, 8000);
+    // Seguro: ocultar loader máximo en 10s
+    setTimeout(function () { if (loader) loader.classList.add('hidden'); }, 10000);
   }
 
   if (document.readyState === 'loading') {
