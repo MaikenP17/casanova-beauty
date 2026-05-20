@@ -1,7 +1,6 @@
 /* ═══════════════════════════════════════════════════════
    CASANOVA BEAUTY — scroll-video.js
-   Animación scroll frame-a-frame desde imágenes WebP.
-   Fallback a video si los frames no existen.
+   Animación scroll frame-a-frame — JPG, iOS-safe.
 ═══════════════════════════════════════════════════════ */
 
 (function () {
@@ -10,8 +9,12 @@
   // ── CONFIG ────────────────────────────────────────────
   var TOTAL_FRAMES = 106;
   var FRAME_BASE   = 'Recursos/frames/frame_';
-  var FRAME_EXT    = '.webp';
-  var PRELOAD_MIN  = 1; // frame 0 basta para mostrar algo — móvil no debe esperar
+  var FRAME_EXT    = '.jpg';
+
+  // iOS Safari tiene límites estrictos de memoria en canvas.
+  // DPR=1 en iOS evita que el buffer cuadruplique tamaño sin ganancia visible.
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var dpr   = isIOS ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
 
   // ── DOM ───────────────────────────────────────────────
   var wrapper  = document.getElementById('hero-scroll-wrapper');
@@ -22,10 +25,20 @@
 
   if (!wrapper || !canvas) return;
 
-  var ctx = canvas.getContext('2d');
-  // Limitar DPR a 2 — en móviles con DPR 3 el canvas cuadriplica memoria sin ganancia visual
-  var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  var ticking = false;
+  var ctx = null;
+  try { ctx = canvas.getContext('2d'); } catch (e) {}
+
+  var ticking  = false;
+  var modeInit = false;
+
+  function frameSrc(i) {
+    return FRAME_BASE + String(i + 1).padStart(4, '0') + FRAME_EXT;
+  }
+
+  // ── HIDE LOADER ───────────────────────────────────────
+  function hideLoader() {
+    if (loader) loader.classList.add('hidden');
+  }
 
   // ── CANVAS RESIZE ────────────────────────────────────
   function resizeCanvas() {
@@ -35,15 +48,18 @@
     canvas.height = Math.round(h * dpr);
     canvas.style.width  = w + 'px';
     canvas.style.height = h + 'px';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
 
   // ── COVER DRAW ────────────────────────────────────────
   function drawSource(src) {
+    if (!ctx) return;
     var cw = window.innerWidth;
     var ch = window.innerHeight;
-    var iw = src.naturalWidth  || src.videoWidth  || 1280;
-    var ih = src.naturalHeight || src.videoHeight || 720;
+    var iw = src.naturalWidth  || src.videoWidth  || 1080;
+    var ih = src.naturalHeight || src.videoHeight || 608;
+    if (iw === 0 || ih === 0) return;
+
     var imgA = iw / ih;
     var cvA  = cw / ch;
     var dW, dH, dX, dY;
@@ -53,15 +69,18 @@
     } else {
       dH = ch; dW = ch * imgA; dX = (cw - dW) / 2; dY = 0;
     }
-    ctx.clearRect(0, 0, cw, ch);
-    ctx.drawImage(src, dX, dY, dW, dH);
+
+    try {
+      ctx.clearRect(0, 0, cw, ch);
+      ctx.drawImage(src, dX, dY, dW, dH);
+    } catch (e) {}
   }
 
   // ── SCROLL PROGRESS ───────────────────────────────────
   function getProgress() {
     var top   = wrapper.offsetTop;
     var h     = wrapper.offsetHeight;
-    var sy    = window.scrollY || window.pageYOffset;
+    var sy    = window.scrollY || window.pageYOffset || 0;
     var denom = h - window.innerHeight;
     if (denom <= 0) return 0;
     return Math.max(0, Math.min(1, (sy - top) / denom));
@@ -87,12 +106,8 @@
     if (navbar) navbar.classList.toggle('scrolled', (window.scrollY || 0) > 50);
   }
 
-  function frameSrc(i) {
-    return FRAME_BASE + String(i + 1).padStart(4, '0') + FRAME_EXT;
-  }
-
   // ══════════════════════════════════════════════════════
-  // MODO A — FRAMES WebP desde disco
+  // MODO A — FRAMES JPG
   // ══════════════════════════════════════════════════════
   var frames       = new Array(TOTAL_FRAMES);
   var framesLoaded = 0;
@@ -113,10 +128,12 @@
           drawSource(img);
           lastFrameIdx = idx;
         } else {
-          // Frame aún no cargado: dibuja el más cercano disponible
-          for (var d = 1; d < 10; d++) {
+          // Busca el frame cargado más cercano hacia atrás y adelante
+          for (var d = 1; d < 20; d++) {
             var prev = frames[idx - d];
             if (prev && prev.complete && prev.naturalWidth > 0) { drawSource(prev); break; }
+            var next = frames[idx + d];
+            if (next && next.complete && next.naturalWidth > 0) { drawSource(next); break; }
           }
         }
       }
@@ -128,6 +145,9 @@
   }
 
   function startFrameMode(firstFrame) {
+    if (modeInit) return;
+    modeInit = true;
+
     frames[0] = firstFrame;
     framesLoaded = 1;
 
@@ -136,51 +156,53 @@
     drawSource(firstFrame);
     lastFrameIdx = 0;
 
-    // Precarga todos los frames en segundo plano
-    for (var i = 1; i < TOTAL_FRAMES; i++) {
-      (function (idx) {
-        var img = new Image();
-        img.onload = function () {
-          framesLoaded++;
-          if (!scrollReady && framesLoaded >= PRELOAD_MIN) {
-            scrollReady = true;
-            if (loader) loader.classList.add('hidden');
-          }
-        };
-        img.onerror = function () {
-          framesLoaded++;
-        };
-        img.src = frameSrc(idx);
-        frames[idx] = img;
-      })(i);
-    }
+    // Activa scroll y oculta loader sin esperar más frames
+    scrollReady = true;
+    hideLoader();
 
-    // Activar scroll si PRELOAD_MIN ya está satisfecho con el frame 0
-    if (framesLoaded >= PRELOAD_MIN) {
-      scrollReady = true;
-      if (loader) loader.classList.add('hidden');
+    // Precarga en bloques — en iOS pausas breves entre lotes evitan saturar memoria
+    var BATCH_SIZE = isIOS ? 4 : 15;
+    var BATCH_DELAY = isIOS ? 400 : 30;
+    var nextIdx = 1;
+
+    function loadNextBatch() {
+      var end = Math.min(nextIdx + BATCH_SIZE, TOTAL_FRAMES);
+      for (var i = nextIdx; i < end; i++) {
+        (function (idx) {
+          var img = new Image();
+          img.onload  = function () { framesLoaded++; };
+          img.onerror = function () { framesLoaded++; };
+          img.src = frameSrc(idx);
+          frames[idx] = img;
+        })(i);
+      }
+      nextIdx = end;
+      if (nextIdx < TOTAL_FRAMES) {
+        setTimeout(loadNextBatch, BATCH_DELAY);
+      }
     }
+    loadNextBatch();
 
     window.addEventListener('scroll', onScrollFrames, { passive: true });
     window.addEventListener('resize', function () {
       resizeCanvas();
       var cur = frames[lastFrameIdx >= 0 ? lastFrameIdx : 0];
-      if (cur && cur.complete) drawSource(cur);
+      if (cur && cur.complete && cur.naturalWidth > 0) drawSource(cur);
     });
   }
 
   // ══════════════════════════════════════════════════════
-  // MODO B — VIDEO directo (fallback si no hay frames)
+  // MODO B — VIDEO directo (fallback si no hay frames JPG)
   // ══════════════════════════════════════════════════════
-  var video       = null;
-  var videoReady  = false;
-  var isSeeking   = false;
+  var video      = null;
+  var videoReady = false;
+  var isSeeking  = false;
   var pendingProg = null;
 
   function seekVideo(progress) {
     if (!videoReady || !video.duration) return;
     var target = progress * video.duration;
-    if (Math.abs(video.currentTime - target) < 0.016) return;
+    if (Math.abs(video.currentTime - target) < 0.02) return;
     if (isSeeking) { pendingProg = progress; return; }
     isSeeking = true;
     video.currentTime = target;
@@ -199,6 +221,16 @@
   }
 
   function startVideoMode() {
+    if (modeInit) return;
+    modeInit = true;
+
+    // En iOS el seeking de video sin interacción del usuario no funciona.
+    // Mostramos fallback estático en su lugar.
+    if (isIOS) {
+      showStaticFallback();
+      return;
+    }
+
     video = document.createElement('video');
     video.muted       = true;
     video.preload     = 'auto';
@@ -210,14 +242,14 @@
     function onReady() {
       if (videoReady) return;
       videoReady = true;
-      if (loader) loader.classList.add('hidden');
+      hideLoader();
       video.currentTime = 0;
     }
 
     video.addEventListener('loadeddata', onReady);
     video.addEventListener('canplay',    onReady);
     video.addEventListener('seeked', function () {
-      drawSource(video);
+      if (video.readyState >= 2) drawSource(video);
       isSeeking = false;
       if (pendingProg !== null) {
         var p = pendingProg;
@@ -226,7 +258,8 @@
       }
     });
     video.addEventListener('error', function () {
-      if (loader) loader.classList.add('hidden');
+      hideLoader();
+      showStaticFallback();
     });
 
     video.src = 'Recursos/' + encodeURIComponent('Video Scroll.mp4');
@@ -238,26 +271,69 @@
     });
   }
 
+  // ── FALLBACK ESTÁTICO ─────────────────────────────────
+  // Si canvas falla completamente o no hay frames ni video,
+  // muestra un fondo elegante de marca en lugar de rosado vacío.
+  function showStaticFallback() {
+    hideLoader();
+    var sticky = document.getElementById('hero-sticky');
+    if (!sticky) return;
+    // Ocultar canvas y mostrar gradiente de marca
+    canvas.style.display = 'none';
+    sticky.style.background = 'linear-gradient(160deg, #F2C4C4 0%, #E8D5C4 40%, #C49A8A 100%)';
+    // Activar overlays con opacidad fija para que se vean los textos
+    scrollReady = true;
+    updateOverlays(0);
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        updateOverlays(getProgress());
+        updateNavbar();
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
   // ── INIT ─────────────────────────────────────────────
   function init() {
     resizeCanvas();
     updateOverlays(0);
     updateNavbar();
 
-    // Prueba si frame_0001.webp existe
+    // Si el canvas context falló (iOS memoria), ir directo a fallback
+    if (!ctx) {
+      hideLoader();
+      showStaticFallback();
+      return;
+    }
+
+    // Prueba si frame_0001.jpg existe
     var probe = new Image();
+
+    var probeTimeout = setTimeout(function () {
+      // Si frame 0 no cargó en 5s, usar fallback de video
+      probe.onload = probe.onerror = null;
+      startVideoMode();
+    }, 5000);
+
     probe.onload = function () {
-      startFrameMode(probe);
+      clearTimeout(probeTimeout);
+      // Verificar que la imagen realmente tiene píxeles (bug WebP en iOS)
+      if (probe.naturalWidth > 0 && probe.naturalHeight > 0) {
+        startFrameMode(probe);
+      } else {
+        startVideoMode();
+      }
     };
     probe.onerror = function () {
-      console.info('[CasanovaBeauty] Sin frames WebP. Usando video directo.');
-      console.info('   Para mejor rendimiento: node extract-frames.js');
+      clearTimeout(probeTimeout);
       startVideoMode();
     };
     probe.src = frameSrc(0);
 
-    // Seguro: ocultar loader máximo en 10s
-    setTimeout(function () { if (loader) loader.classList.add('hidden'); }, 10000);
+    // Loader oculto máximo en 8s pase lo que pase
+    setTimeout(hideLoader, 8000);
   }
 
   if (document.readyState === 'loading') {

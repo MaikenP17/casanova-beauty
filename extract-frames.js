@@ -54,11 +54,11 @@ if (prevFrames.length > 0) {
   prevFrames.forEach(f => fs.unlinkSync(path.join(framesDir, f)));
 }
 
-// Extrae frames: 15fps, WebP calidad 78, 1280px — ~106 frames para 7s de video
-const outputPattern = path.join(framesDir, 'frame_%04d.webp');
+// Extrae frames: 15fps, JPG calidad alta (q=3 ≈ 88%), 1080px — ~106 frames para 7s de video
+const outputPattern = path.join(framesDir, 'frame_%04d.jpg');
 try {
   execSync(
-    `ffmpeg -y -i "${videoPath}" -vf "fps=15,scale=1280:-2" -c:v libwebp -quality 78 -compression_level 4 -lossless 0 "${outputPattern}"`,
+    `ffmpeg -y -i "${videoPath}" -vf "fps=15,scale=1080:-2" -q:v 3 "${outputPattern}"`,
     { stdio: 'inherit' }
   );
 } catch (e) {
@@ -67,13 +67,13 @@ try {
   process.exit(1);
 }
 
-const frameCount = fs.readdirSync(framesDir).filter(f => f.endsWith('.webp')).length;
+const frameCount = fs.readdirSync(framesDir).filter(f => f.endsWith('.jpg')).length;
 
 if (frameCount === 0) {
   console.error('❌ No se generaron frames. Revisa el video o los permisos de carpeta.');
   process.exit(1);
 }
 
-console.log(`\n✅ ${frameCount} frames WebP extraídos en Recursos/frames/`);
+console.log(`\n✅ ${frameCount} frames JPG extraídos en Recursos/frames/`);
 console.log(`   TOTAL_FRAMES ya está fijado en scroll-video.js — no necesitas cambiarlo.`);
 console.log(`\n   Haz push de los frames a Git y Vercel los servirá automáticamente.`);
