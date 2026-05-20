@@ -24,7 +24,7 @@
       price: 89000,
       category: 'labios',
       badge: 'Más Vendido',
-      image: IMG + 'rhode-peptide-lip-treatment.jpg'
+      image: IMG + 'Peptide Lip Treatment Salted Caramel.webp'
     },
     {
       id: '4',
@@ -33,7 +33,7 @@
       price: 145000,
       category: 'labios',
       badge: 'Más Vendido',
-      image: IMG + 'charlotte-tilbury-pillow-talk.jpg'
+      image: IMG + 'Pillow Talk Lipstick.webp'
     },
     {
       id: '6',
@@ -42,7 +42,7 @@
       price: 78000,
       category: 'ojos',
       badge: null,
-      image: IMG + 'kiko-eyeshadow-palette.jpg'
+      image: IMG + 'Smart Fusion Eyeshadow Palette.jpg'
     },
     {
       id: '10',
@@ -51,7 +51,7 @@
       price: 178000,
       category: 'base',
       badge: null,
-      image: IMG + 'charlotte-tilbury-flawless-filter.jpg'
+      image: IMG + 'Flawless Filter.webp'
     },
     {
       id: '9',
@@ -60,7 +60,7 @@
       price: 125000,
       category: 'rostro',
       badge: 'Nuevo',
-      image: IMG + 'rare-beauty-soft-pinch-blush.jpg'
+      image: IMG + 'Soft Pinch Liquid Blush.webp'
     },
     {
       id: '5',
@@ -69,7 +69,7 @@
       price: 98000,
       category: 'skincare',
       badge: null,
-      image: IMG + 'rhode-barrier-butter.jpg'
+      image: IMG + 'Barrier Butter.webp'
     }
   ];
 
