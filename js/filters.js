@@ -6,7 +6,16 @@
 (function () {
   'use strict';
 
+  // ── BASE DE IMÁGENES LOCALES ───────────────────────────
+  // Todas las imágenes viven en Recursos/productos/
+  // Formatos aceptados: .jpg .jpeg .png .webp
+  // Nomenclatura: marca-nombre-corto.jpg (minúsculas, guiones)
+  var IMG = 'Recursos/productos/';
+
   // ── 6 PRODUCTOS — 1 por categoría (labios ×2) ─────────
+  // Para agregar un producto nuevo: copia el bloque, asigna
+  // un id único, pon la imagen en Recursos/productos/ y
+  // referénciala en el campo "image".
   var PRODUCTS = [
     {
       id: '1',
@@ -15,7 +24,7 @@
       price: 89000,
       category: 'labios',
       badge: 'Más Vendido',
-      image: 'https://images.unsplash.com/photo-1631214524020-3c69b8b2b110?w=600&q=80&fit=crop'
+      image: IMG + 'rhode-peptide-lip-treatment.jpg'
     },
     {
       id: '4',
@@ -24,7 +33,7 @@
       price: 145000,
       category: 'labios',
       badge: 'Más Vendido',
-      image: 'https://images.unsplash.com/photo-1599733594230-6b823276b1e3?w=600&q=80&fit=crop'
+      image: IMG + 'charlotte-tilbury-pillow-talk.jpg'
     },
     {
       id: '6',
@@ -33,7 +42,7 @@
       price: 78000,
       category: 'ojos',
       badge: null,
-      image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=600&q=80&fit=crop'
+      image: IMG + 'kiko-eyeshadow-palette.jpg'
     },
     {
       id: '10',
@@ -42,7 +51,7 @@
       price: 178000,
       category: 'base',
       badge: null,
-      image: 'https://images.unsplash.com/photo-1503236823255-94609f598e71?w=600&q=80&fit=crop'
+      image: IMG + 'charlotte-tilbury-flawless-filter.jpg'
     },
     {
       id: '9',
@@ -51,7 +60,7 @@
       price: 125000,
       category: 'rostro',
       badge: 'Nuevo',
-      image: 'https://images.unsplash.com/photo-1614159869003-1b1f2d5b6b7f?w=600&q=80&fit=crop'
+      image: IMG + 'rare-beauty-soft-pinch-blush.jpg'
     },
     {
       id: '5',
@@ -60,7 +69,7 @@
       price: 98000,
       category: 'skincare',
       badge: null,
-      image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80&fit=crop'
+      image: IMG + 'rhode-barrier-butter.jpg'
     }
   ];
 
