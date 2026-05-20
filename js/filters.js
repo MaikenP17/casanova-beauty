@@ -24,7 +24,7 @@
       price: 89000,
       category: 'labios',
       badge: 'Más Vendido',
-      image: IMG + 'Peptide Lip Treatment Salted Caramel.webp'
+      image: IMG + 'peptide-lip-treatment.webp'
     },
     {
       id: '4',
@@ -33,7 +33,7 @@
       price: 145000,
       category: 'labios',
       badge: 'Más Vendido',
-      image: IMG + 'Pillow Talk Lipstick.webp'
+      image: IMG + 'pillow-talk-lipstick.webp'
     },
     {
       id: '6',
@@ -42,7 +42,7 @@
       price: 78000,
       category: 'ojos',
       badge: null,
-      image: IMG + 'Smart Fusion Eyeshadow Palette.jpg'
+      image: IMG + 'smart-fusion-palette.jpg'
     },
     {
       id: '10',
@@ -51,7 +51,7 @@
       price: 178000,
       category: 'base',
       badge: null,
-      image: IMG + 'Flawless Filter.webp'
+      image: IMG + 'flawless-filter.webp'
     },
     {
       id: '9',
@@ -60,7 +60,7 @@
       price: 125000,
       category: 'rostro',
       badge: 'Nuevo',
-      image: IMG + 'Soft Pinch Liquid Blush.webp'
+      image: IMG + 'soft-pinch-blush.webp'
     },
     {
       id: '5',
@@ -69,7 +69,7 @@
       price: 98000,
       category: 'skincare',
       badge: null,
-      image: IMG + 'Barrier Butter.webp'
+      image: IMG + 'barrier-butter.webp'
     }
   ];
 

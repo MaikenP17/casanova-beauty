@@ -15,9 +15,15 @@
       ]
     },
     {
-      "source": "/Recursos/productos/(.*)",
+      "source": "/Recursos/Productos/(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    },
+    {
+      "source": "/Recursos/frames-mobile/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
     },
     {

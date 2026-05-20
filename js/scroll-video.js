@@ -6,15 +6,22 @@
 (function () {
   'use strict';
 
-  // ── CONFIG ────────────────────────────────────────────
-  var TOTAL_FRAMES = 106;
-  var FRAME_BASE   = 'Recursos/frames/frame_';
-  var FRAME_EXT    = '.jpg';
+  // ── DEVICE DETECTION ─────────────────────────────────
+  var isIOS    = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  var isMobile = isIOS || /Mobi|Android/i.test(navigator.userAgent);
 
-  // iOS Safari tiene límites estrictos de memoria en canvas.
-  // DPR=1 en iOS evita que el buffer cuadruplique tamaño sin ganancia visible.
-  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-  var dpr   = isIOS ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
+  // ── CONFIG — rutas separadas mobile / desktop ─────────
+  // Mobile: frames-mobile/ (640px portrait, 91f) del Video scroll Movil.
+  // Desktop: frames/ (1080px landscape, 106f) del Video Scroll original.
+  var TOTAL_FRAMES = isMobile ? 91  : 106;
+  var FRAME_BASE   = isMobile ? 'Recursos/frames-mobile/frame_' : 'Recursos/frames/frame_';
+  var FRAME_EXT    = '.jpg';
+  var VIDEO_SRC    = isMobile
+    ? 'Recursos/' + encodeURIComponent('Video scroll Movil.mp4')
+    : 'Recursos/' + encodeURIComponent('Video Scroll.mp4');
+
+  // DPR=1 en mobile: evita que el canvas cuadruplique memoria en iOS/Android.
+  var dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 1.5);
 
   // ── DOM ───────────────────────────────────────────────
   var wrapper  = document.getElementById('hero-scroll-wrapper');
@@ -262,7 +269,7 @@
       showStaticFallback();
     });
 
-    video.src = 'Recursos/' + encodeURIComponent('Video Scroll.mp4');
+    video.src = VIDEO_SRC;
 
     window.addEventListener('scroll', onScrollVideo, { passive: true });
     window.addEventListener('resize', function () {
